@@ -3,17 +3,20 @@ package gov.nasa.generator.generators;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import org.reflections.Reflections;
 
 public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 
-	protected static class AbstractClassBuilder<T> extends AbstractGenerator.Build<T>{
+	public static class AbstractClassBuilder<T> extends AbstractGenerator.Build<T>{
 
 		public AbstractClassBuilder(Class<T> c, GenerationStrategy<T> s) {
 			super(c, s);
 		}
 
 		@Override
-		public AbstractGenerator<T> instance() {
+		public AbstractGenerator<T> instance() throws ParseException, GenerationException {
 			return new AbstractClassGenerator<T>(this);
 		}
 		
@@ -24,9 +27,26 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 	
 	
 	List<AbstractGenerator<T>> generators = new ArrayList<AbstractGenerator<T>>();
+	T current;
 	
-	protected AbstractClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) {
+	protected AbstractClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) throws ParseException, GenerationException {
 		super(b);
+		String name = clazz.getPackage().getName();
+		
+		Reflections reflections = new Reflections(name);
+
+		Set<Class<? extends T>> allClasses = 
+		      reflections.getSubTypesOf(clazz);
+		
+		for (Class<? extends T> sub : allClasses) {
+			generators.add(ClassGenerator.builder(sub, strategy)
+										 .depth(depth)
+										 .length(length)
+										 .path(path)
+										 .instance());
+		}
+		
+		reset();
 	}
 	
 	@Override

@@ -8,6 +8,7 @@ import java.util.List;
 import com.rits.cloning.Cloner;
 
 
+
 public class CartesianStrategy<T> extends GenerationStrategy<T> {
 
 	//NumberGenerator
@@ -209,39 +210,46 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	
 	//AbstractClassGenerator
 	@Override
-	T generate(AbstractClassGenerator<T> g) {
+	T generate(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
 		T object = peek(g);
 		next(g);
 		return object;
 	}
 	@Override
 	boolean hasNext(AbstractClassGenerator<T> g) {
-		return false;
+		return g.hasNext;
 	}
 	@Override
-	void reset(AbstractClassGenerator<T> g) {
-		
+	void reset(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
+		for (AbstractGenerator<T> classGenerator : g.generators) {
+			classGenerator.reset();
+		}
+		g.current = (T) g.generators.get(0).peek();
+
+		g.hasNext=g.generators.size()>0;
 	}
 	@Override
 	T peek(AbstractClassGenerator<T> g) {
-		return null;
+		Cloner cloner = new Cloner();
+		T object = (T) cloner.deepClone(g.current);
+		return object;
 	}
 	@Override
-	void next(AbstractClassGenerator<T> g) {
-		
+	void next(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
+		int i=0;
+		while(i<g.generators.size() && g.generators.get(i).isLast()){
+			i++;
+		}
+		if(i<g.generators.size()){
+			g.generators.get(i).next();
+			g.current = (T) g.generators.get(i).peek();
+		}else{
+			g.hasNext=false;
+		}
 	}
 	@Override
-	boolean isLast(AbstractClassGenerator<T> abstractClassGenerator) {
-		return false;
+	boolean isLast(AbstractClassGenerator<T> g) {
+		return g.generators.get(g.generators.size()-1).isLast();
 	}
-	
-		
-	
-		
-	
-	
-	
-
-	
 
 }

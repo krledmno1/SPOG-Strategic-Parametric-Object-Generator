@@ -75,5 +75,4 @@ public abstract class AbstractGenerator<T> {
 	
 	protected abstract AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException;
 
-	
 }

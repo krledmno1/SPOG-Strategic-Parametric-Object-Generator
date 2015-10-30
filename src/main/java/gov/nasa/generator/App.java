@@ -2,8 +2,10 @@ package gov.nasa.generator;
 
 import java.text.ParseException;
 
+import gov.nasa.generator.examples.Abstract;
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
+import gov.nasa.generator.generators.AbstractClassGenerator;
 import gov.nasa.generator.generators.AbstractGenerator;
 import gov.nasa.generator.generators.CartesianStrategy;
 import gov.nasa.generator.generators.ClassGenerator;
@@ -121,18 +123,33 @@ public class App
 			e.printStackTrace();
 		}
 	}
+	
+	
+	private static void abstractClassListExample(){
+		try {
+			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
+			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).instance();
+			
+			while(generator.hasNext())
+				System.out.println(generator.generate());
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 	
     public static void main( String[] args )
     {
     	
-    	integerExample();
-    	doubleExample();
-    	simpleObjectExample();
-    	nestedObjectExample();
-    	simpleobjectListExample();
-    	nestedObjectListExample();
+//    	integerExample();
+//    	doubleExample();
+//    	simpleObjectExample();
+//    	nestedObjectExample();
+//    	simpleobjectListExample();
+//    	nestedObjectListExample();
+    	abstractClassListExample();
     		
     }
 }
