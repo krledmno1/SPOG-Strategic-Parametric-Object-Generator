@@ -108,6 +108,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 														.depth(depth)
 														.length(length)
 														.path(path)
+														.topLvl(topLvl)
 														.instance());
 			return;
 		}
@@ -121,9 +122,10 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 			//abstract classes
 			generators.put(field, AbstractClassGenerator.builder(field.getType(),
 					strategy)
-					.depth(depth-1)
+					.depth(depth)
 					.length(length)
 					.path(path)
+					.topLvl(topLvl)
 					.instance());
 			
 			return;
@@ -135,6 +137,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 													.depth(depth)
 													.length(length)
 													.path(path)
+													.topLvl(topLvl)
 													.instance());
 		return;
 		
@@ -167,6 +170,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 				.depth(depth)
 				.length(length)
 				.path(path)
+				.topLvl(topLvl)
 				.instance();
 	}
 

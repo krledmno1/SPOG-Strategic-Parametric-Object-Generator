@@ -12,6 +12,7 @@ public abstract class AbstractGenerator<T> {
 	protected String path;
 	protected int depth; 
 	protected int length;
+	protected boolean topLvl;
 	
 	//internal use only
 	boolean hasNext;
@@ -27,6 +28,8 @@ public abstract class AbstractGenerator<T> {
 		private String path="";
 		private int depth=2; 
 		private int length=2;
+		private boolean topLvl=true;
+
 		
 		public Build(Class<T> c, GenerationStrategy<T> s){
 			clazz=c;
@@ -47,6 +50,10 @@ public abstract class AbstractGenerator<T> {
 			length=l;
 			return this;
 		}
+		public Build<T> topLvl(boolean t){
+			topLvl=t;
+			return this;
+		}
 		
 		abstract public AbstractGenerator<T> instance() throws ParseException, GenerationException;
 		
@@ -58,6 +65,7 @@ public abstract class AbstractGenerator<T> {
 		path=b.path;
 		depth=b.depth;
 		length=b.length;
+		topLvl=b.topLvl;
 	}
 	
 	

@@ -40,6 +40,7 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 											.depth(depth)
 											.length(length)
 											.path(path)
+											.topLvl(topLvl)
 											.instance();
 		reset();
 	}
@@ -71,6 +72,7 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 				.depth(depth)
 				.length(length)
 				.path(path)
+				.topLvl(topLvl)
 				.instance();
 	}
 	

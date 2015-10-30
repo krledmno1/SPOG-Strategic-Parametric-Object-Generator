@@ -310,6 +310,7 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 				.depth(depth)
 				.length(length)
 				.path(path)
+				.topLvl(topLvl)
 				.instance();
 	}
 

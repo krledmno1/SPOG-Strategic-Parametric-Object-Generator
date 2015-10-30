@@ -2,7 +2,9 @@ package gov.nasa.generator.generators;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +30,8 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 	
 	
 	List<AbstractGenerator<T>> generators = new ArrayList<AbstractGenerator<T>>();
+	Deque<AbstractGenerator<T>> workingGenerators = new ArrayDeque<AbstractGenerator<T>>();
+	AbstractGenerator<T> currentGenerator;
 	T current;
 	
 	protected AbstractClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) throws ParseException, GenerationException {
@@ -47,22 +51,28 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 			if(isRecursive(sub)){
 				
 					
-					for(int i=depth-1;i>=0;i--){
+					for(int i=depth-1;i>0;i--){
 						generators.add(ClassGenerator.builder(sub, strategy)
 								 .depth(i)
 								 .length(length)
 								 .path(path)
+								 .topLvl(false)
 								 .instance());
 					}
 			}
 			else{
+				if(topLvl || depth==1){
 					generators.add(ClassGenerator.builder(sub, strategy)
 						 .depth(depth)
 						 .length(length)
 						 .path(path)
+						 .topLvl(topLvl)
 						 .instance());
+				}
+				
 			}
 		}
+		
 		
 		if(generators.size()>0){
 			reset();
@@ -114,6 +124,7 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 				.depth(depth)
 				.length(length)
 				.path(path)
+				.topLvl(topLvl)
 				.instance();
 	}
 

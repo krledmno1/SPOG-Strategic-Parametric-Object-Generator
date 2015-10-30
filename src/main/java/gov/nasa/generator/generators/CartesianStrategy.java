@@ -222,9 +222,12 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	@Override
 	void reset(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
 		for (AbstractGenerator<T> classGenerator : g.generators) {
-			classGenerator.reset();
+			Cloner cloner = new Cloner();
+			AbstractGenerator<T> object = (AbstractGenerator<T>) cloner.deepClone(classGenerator);
+			g.workingGenerators.addLast(object);
 		}
-		g.current = (T) g.generators.get(0).peek();
+		g.currentGenerator = g.workingGenerators.pop();
+		g.current = (T) g.currentGenerator.peek();
 
 		g.hasNext=g.generators.size()>0;
 	}
@@ -236,20 +239,30 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	}
 	@Override
 	void next(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
-		int i=0;
-		while(i<g.generators.size() && g.generators.get(i).isLast()){
-			i++;
+		
+		if(!g.currentGenerator.hasNext()){
+			if(g.workingGenerators.isEmpty()){
+				g.hasNext=false;
+				return;
+			}
+			else{
+				
+				//System.out.println("NEXT GEN at " + g.depth);
+				g.currentGenerator=g.workingGenerators.pop();
+			}
 		}
-		if(i<g.generators.size()){
-			g.generators.get(i).next();
-			g.current = (T) g.generators.get(i).peek();
-		}else{
-			g.hasNext=false;
+		else{
+			g.currentGenerator.next();
 		}
+		
+		Cloner cloner = new Cloner();
+		T object = (T) cloner.deepClone(g.currentGenerator.peek());			
+		g.current = object;
+	
 	}
 	@Override
 	boolean isLast(AbstractClassGenerator<T> g) {
-		return g.generators.get(g.generators.size()-1).isLast();
+		return g.currentGenerator.isLast()&&g.workingGenerators.isEmpty();
 	}
 
 }
