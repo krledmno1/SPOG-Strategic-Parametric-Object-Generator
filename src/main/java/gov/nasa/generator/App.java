@@ -128,7 +128,7 @@ public class App
 	private static void abstractClassListExample(){
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
-			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).instance();
+			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(4).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());

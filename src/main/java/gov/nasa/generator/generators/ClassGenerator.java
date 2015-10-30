@@ -118,7 +118,14 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		}
 		
 		if(Modifier.isAbstract(field.getType().getModifiers())){
-			//TODO: abstract classes
+			//abstract classes
+			generators.put(field, AbstractClassGenerator.builder(field.getType(),
+					strategy)
+					.depth(depth-1)
+					.length(length)
+					.path(path)
+					.instance());
+			
 			return;
 		}
 		

@@ -1,5 +1,6 @@
 package gov.nasa.generator.generators;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,8 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 		}
 		
 	}
-	public static <T> AbstractClassBuilder<T> builder(Class<T> c, GenerationStrategy<T> s){
-		 return new AbstractClassGenerator.AbstractClassBuilder<T>(c, s);
+	public static <T> AbstractClassBuilder<T> builder(Class<?> c, GenerationStrategy<T> s){
+		 return new AbstractClassGenerator.AbstractClassBuilder<T>((Class<T>)c, s);
 	}
 	
 	
@@ -31,24 +32,58 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 	
 	protected AbstractClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) throws ParseException, GenerationException {
 		super(b);
-		String name = clazz.getPackage().getName();
 		
+		
+		//TODO: Differensiate on the generic type: if primitive, list...
+		String name = clazz.getPackage().getName();
 		Reflections reflections = new Reflections(name);
-
 		Set<Class<? extends T>> allClasses = 
 		      reflections.getSubTypesOf(clazz);
 		
+		
+		
 		for (Class<? extends T> sub : allClasses) {
-			generators.add(ClassGenerator.builder(sub, strategy)
-										 .depth(depth)
-										 .length(length)
-										 .path(path)
-										 .instance());
+			
+			if(isRecursive(sub)){
+				
+					
+					for(int i=depth-1;i>=0;i--){
+						generators.add(ClassGenerator.builder(sub, strategy)
+								 .depth(i)
+								 .length(length)
+								 .path(path)
+								 .instance());
+					}
+			}
+			else{
+					generators.add(ClassGenerator.builder(sub, strategy)
+						 .depth(depth)
+						 .length(length)
+						 .path(path)
+						 .instance());
+			}
 		}
 		
-		reset();
+		if(generators.size()>0){
+			reset();
+		}
+		else{
+			throw new GenerationException("No non-recursive sub-classes");
+		}
 	}
 	
+	private boolean isRecursive(Class<? extends T> sub) {
+
+		Field [] fieldList = sub.getDeclaredFields();
+		
+		for (Field field : fieldList) {
+			if(field.getType().equals(clazz)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public T generate() throws ParseException, GenerationException{
 		return strategy.generate(this);
