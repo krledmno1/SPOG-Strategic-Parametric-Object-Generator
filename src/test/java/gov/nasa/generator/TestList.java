@@ -9,32 +9,63 @@ import java.util.List;
 import org.junit.Test;
 
 import gov.nasa.generator.examples.B;
+import gov.nasa.generator.examples.C;
 import gov.nasa.generator.generators.AbstractGenerator;
 import gov.nasa.generator.generators.CartesianStrategy;
-import gov.nasa.generator.generators.ClassGenerator;
 import gov.nasa.generator.generators.GenerationException;
 import gov.nasa.generator.generators.GenerationStrategy;
+import gov.nasa.generator.generators.ListGenerator;
 
 public class TestList {
 
 	@Test
-	public void testSimpleObject() {
+	public void testSimpleObjectList() {
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).path("resources/").instance();
+			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).path("resources/").instance();
 			
-			List<B> list = new ArrayList<B>();
+			List<List<B>> list = new ArrayList<List<B>>();
 			while(generator.hasNext()){
-				B object = (B) generator.generate();
-				System.out.println(object);
+				List<B> object = (List<B>) generator.generate();
+//				System.out.println(object);
 				list.add(object);
 			}
 			
-			assertEquals("Number of simple object", 10, list.size());
+			assertEquals("Number of lists with simple objects", 5+5*5+5*5*5, list.size());
+
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+	        assertTrue( "Exception!",  false );
+
+		}
 		
-			} catch (ParseException | GenerationException e) {
-				e.printStackTrace();
+	}
+	
+	
+	
+	@Test
+	public void testNestedObjectList() {
+		try {
+			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
+			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).path("resources/").instance();
+			
+			List<List<C>> list = new ArrayList<List<C>>();
+			while(generator.hasNext()){
+				List<C> object = (List<C>) generator.generate();
+//				System.out.println(object);
+				list.add(object);
 			}
+			
+			assertEquals("Number of lists with simple objects", 5+5*5+5*5*5, list.size());
+
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+	        assertTrue( "Exception!",  false );
+
+		}
+		
 	}
 
 }

@@ -33,7 +33,7 @@ public class App
 	    		AbstractGenerator<Integer> generator = NumberGenerator.builder(
 	    														Integer.class, strategy,
 																min, max, step)
-																.instance();
+																.path("resources/").instance();
 	    		
 	    		while(generator.hasNext())
 	    			System.out.println(generator.generate());
@@ -55,7 +55,7 @@ public class App
 	    		AbstractGenerator<Double> generator = NumberGenerator.builder(
 															Double.class, strategy,
 															min, max, step)
-	    													.instance();
+	    													.path("resources/").instance();
     		
     		while(generator.hasNext())
     			System.out.println(generator.generate());
@@ -69,7 +69,7 @@ public class App
 	private static void simpleObjectExample(){
 		try {
 				GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-				AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
+				AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).path("resources/").instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -83,7 +83,7 @@ public class App
 	private static void nestedObjectExample(){
 		try {
 				GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-				AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
+				AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).path("resources/").instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -99,7 +99,7 @@ public class App
 	private static void simpleobjectListExample(){
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
+			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).path("resources/").instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -114,7 +114,7 @@ public class App
 	private static void nestedObjectListExample(){
 		try {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
+			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).path("resources/").instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -128,7 +128,7 @@ public class App
 	private static void abstractClassListExample(){
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
-			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).instance();
+			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).path("resources/").instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());

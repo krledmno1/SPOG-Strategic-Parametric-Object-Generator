@@ -34,7 +34,7 @@ public class TestNumber extends TestCase {
 		List<Integer> list = new ArrayList<Integer>();
 		while(generator.hasNext()){
 			Integer obj = (Integer) generator.generate();
-			System.out.println(obj);
+//			System.out.println(obj);
 			list.add(obj);
 		}
 		
@@ -67,7 +67,7 @@ public class TestNumber extends TestCase {
 		List<Double> list = new ArrayList<Double>();
 		while(generator.hasNext()){
 			Double obj = (Double) generator.generate();
-			System.out.println(obj);
+//			System.out.println(obj);
 			list.add(obj);
 		}
 		
