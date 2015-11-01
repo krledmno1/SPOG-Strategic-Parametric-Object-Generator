@@ -41,35 +41,54 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 		//TODO: Differensiate on the generic type: if primitive, list...
 		String name = clazz.getPackage().getName();
 		Reflections reflections = new Reflections(name);
+		
+		//get all subclasses
 		Set<Class<? extends T>> allClasses = 
 		      reflections.getSubTypesOf(clazz);
 		
-		
-		
+		boolean isRecursiveHierarchy = false;
 		for (Class<? extends T> sub : allClasses) {
-			
 			if(isRecursive(sub)){
-				
-					
-					for(int i=depth-1;i>0;i--){
-						generators.add(ClassGenerator.builder(sub, strategy)
-								 .depth(i)
-								 .length(length)
-								 .path(path)
-								 .topLvl(false)
-								 .instance());
-					}
+				isRecursiveHierarchy = true;
 			}
-			else{
-				if(topLvl || depth==1){
-					generators.add(ClassGenerator.builder(sub, strategy)
+		}
+		
+		if(isRecursiveHierarchy){
+			for (Class<? extends T> sub : allClasses) {
+				
+				if(isRecursive(sub)){
+					
+						
+						for(int i=depth-1;i>0;i--){
+							generators.add(ClassGenerator.builder(sub, strategy)
+									 .depth(i)
+									 .length(length)
+									 .path(path)
+									 .topLvl(false)
+									 .instance());
+						}
+				}
+				else{
+					if(topLvl || depth==1){
+						generators.add(ClassGenerator.builder(sub, strategy)
+							 .depth(depth)
+							 .length(length)
+							 .path(path)
+							 .topLvl(topLvl)
+							 .instance());
+					}
+					
+				}
+			}
+		}
+		else{
+			for (Class<? extends T> sub : allClasses) {
+				generators.add(ClassGenerator.builder(sub, strategy)
 						 .depth(depth)
 						 .length(length)
 						 .path(path)
 						 .topLvl(topLvl)
 						 .instance());
-				}
-				
 			}
 		}
 		
