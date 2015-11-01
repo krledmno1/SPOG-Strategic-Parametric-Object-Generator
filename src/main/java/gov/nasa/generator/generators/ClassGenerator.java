@@ -8,8 +8,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,31 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		String csvPath=path+clazz.getSimpleName()+".csv";
 		List<Map<Field,TypeWrapper<Number>>> bounds = read(csvPath);
 		
-		fieldList = clazz.getDeclaredFields();
+		//get all the declared fields in the class and all non private fields
+		//in all superclasses
+		
+		Class<?> current = clazz;
+		Deque<Field> fields = new ArrayDeque<Field>();
+		for (Field field : current.getDeclaredFields()) {
+			fields.add(field);
+		}
+		current = current.getSuperclass();		
+		List<Field> currentfields = new ArrayList<Field>();
+		while(current.getSuperclass()!=null){ // we don't want to process Object.class
+			for (Field field : current.getDeclaredFields()) {
+				if(!Modifier.isPrivate(field.getModifiers())){
+					currentfields.add(field);
+				}
+			}
+			for(int i = currentfields.size()-1;i>=0;i--){
+				fields.addFirst(currentfields.get(i));
+			}
+			currentfields.clear();			
+			current = current.getSuperclass();
+		}
+		
+		fieldList = fields.toArray(new Field[0]);
+		
 		
 		//TODO: check if all the fields where declared in the csvfile and vv
 		
@@ -64,7 +90,18 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		try {
 			constructor = (Constructor<T>) clazz.getConstructor(params);
 		} catch (NoSuchMethodException | SecurityException e) {
-			throw new ParseException("Class needs to declare a constructor with all the fields as parameters", 0);
+			String msg = "Class "+ clazz.getSimpleName() +" needs to declare "
+					+ "a PUBLIC constructor with all the fields as parameters"
+					+ "For instance:\n"
+					+ "public "+clazz.getSimpleName()+"(";
+					int p = 1;
+					for (Class c : params) {
+						msg+= c.getSimpleName()+ " p"+p + " ";
+						p++;
+					}
+					msg+=")";
+			
+			throw new ParseException(msg, 0);
 		}
 
 		//reset

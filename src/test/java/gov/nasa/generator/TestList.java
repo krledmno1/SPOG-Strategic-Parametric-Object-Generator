@@ -31,7 +31,7 @@ public class TestList {
 				list.add(object);
 			}
 			
-			assertEquals("Number of lists with simple objects", 5+5*5+5*5*5, list.size());
+			assertEquals("Number of lists with simple objects", 5*2+10*10+10*10*10, list.size());
 
 			
 		} catch (ParseException | GenerationException e) {

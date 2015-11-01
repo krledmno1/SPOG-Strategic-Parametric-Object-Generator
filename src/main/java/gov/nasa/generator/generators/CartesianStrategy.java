@@ -2,6 +2,7 @@ package gov.nasa.generator.generators;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,9 +124,9 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	}
 	@Override
 	boolean isLast(ClassGenerator<T> g) {
-		boolean isLast = false;
+		boolean isLast = true;
 		for (AbstractGenerator<T> subgen: g.generators.values()) {
-			isLast=isLast||subgen.isLast();
+			isLast=isLast&&subgen.isLast();
 		}
 		return isLast;
 	}
@@ -221,6 +222,7 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	}
 	@Override
 	void reset(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
+		g.workingGenerators=new ArrayDeque<AbstractGenerator<T>>();
 		for (AbstractGenerator<T> classGenerator : g.generators) {
 			Cloner cloner = new Cloner();
 			AbstractGenerator<T> object = (AbstractGenerator<T>) cloner.deepClone(classGenerator);
@@ -240,7 +242,7 @@ public class CartesianStrategy<T> extends GenerationStrategy<T> {
 	@Override
 	void next(AbstractClassGenerator<T> g) throws ParseException, GenerationException {
 		
-		if(!g.currentGenerator.hasNext()){
+		if(g.currentGenerator.isLast()){
 			if(g.workingGenerators.isEmpty()){
 				g.hasNext=false;
 				return;

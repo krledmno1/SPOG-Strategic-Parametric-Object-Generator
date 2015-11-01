@@ -5,6 +5,7 @@ import java.text.ParseException;
 import gov.nasa.generator.examples.Abstract;
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
+import gov.nasa.generator.examples.Encapsulator;
 import gov.nasa.generator.generators.AbstractClassGenerator;
 import gov.nasa.generator.generators.AbstractGenerator;
 import gov.nasa.generator.generators.CartesianStrategy;
@@ -125,7 +126,7 @@ public class App
 	}
 	
 	
-	private static void abstractClassListExample(){
+	private static void abstractClassExample(){
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
 			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).path("resources/").instance();
@@ -134,6 +135,30 @@ public class App
 				System.out.println(generator.generate());
 			
 		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void abstractClassComplexExamlple(){
+		try {
+			
+			CartesianStrategy<Encapsulator> strategy = new CartesianStrategy<Encapsulator>();
+
+			AbstractGenerator<Encapsulator> generator =  
+					ClassGenerator.builder(Encapsulator.class, strategy)
+					.path("resources/")
+					
+					.instance();
+			
+			int i = 1;
+			while(generator.hasNext()){
+				System.out.println(i);
+				System.out.println(generator.generate());
+				i++;
+			}
+
+		} catch (ParseException | GenerationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -149,7 +174,11 @@ public class App
 //    	nestedObjectExample();
 //    	simpleobjectListExample();
 //    	nestedObjectListExample();
-    	abstractClassListExample();
-    		
+//    	abstractClassExample();
+    	abstractClassComplexExamlple();
+
+		
+    	
+    	
     }
 }
