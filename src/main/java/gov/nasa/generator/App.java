@@ -196,7 +196,7 @@ public class App
     	
 //    	integerExample();
 //    	doubleExample();
-//    	simpleObjectExample();
+    	simpleObjectExample();
 //    	nestedObjectExample();
 //    	simpleobjectListExample();
 //    	nestedObjectListExample();

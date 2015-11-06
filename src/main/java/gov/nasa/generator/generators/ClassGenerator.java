@@ -49,8 +49,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		List<Map<Field,TypeWrapper<Number>>> bounds = read(csvPath);
 		
 		//get all the declared fields in the class and all non private fields
-		//in all superclasses
-		
+		//in all superclasses		
 		Class<?> current = clazz;
 		Deque<Field> fields = new ArrayDeque<Field>();
 		for (Field field : current.getDeclaredFields()) {
@@ -70,7 +69,6 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 			currentfields.clear();			
 			current = current.getSuperclass();
 		}
-		
 		fieldList = fields.toArray(new Field[0]);
 		
 		
