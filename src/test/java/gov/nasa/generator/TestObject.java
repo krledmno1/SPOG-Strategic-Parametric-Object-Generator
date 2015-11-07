@@ -22,7 +22,7 @@ public class TestObject {
 	public void testSimpleObject() {
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).path("resources/").instance();
+			AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
 			
 			List<B> list = new ArrayList<B>();
 			while(generator.hasNext()){
@@ -43,7 +43,7 @@ public class TestObject {
 	public void testNestedObject() {	
 				try {
 					GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-					AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).path("resources/").instance();
+					AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
 					
 					List<C> list = new ArrayList<C>();
 					while(generator.hasNext()){

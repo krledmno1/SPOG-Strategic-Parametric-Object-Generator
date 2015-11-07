@@ -63,7 +63,6 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 							generators.add(ClassGenerator.builder(sub, strategy)
 									 .depth(i)
 									 .length(length)
-									 .path(path)
 									 .topLvl(false)
 									 .instance());
 						}
@@ -73,7 +72,6 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 						generators.add(ClassGenerator.builder(sub, strategy)
 							 .depth(depth)
 							 .length(length)
-							 .path(path)
 							 .topLvl(topLvl)
 							 .instance());
 					}
@@ -86,7 +84,6 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 				generators.add(ClassGenerator.builder(sub, strategy)
 						 .depth(depth)
 						 .length(length)
-						 .path(path)
 						 .topLvl(topLvl)
 						 .instance());
 			}
@@ -142,7 +139,6 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 		return builder(clazz, strategy)
 				.depth(depth)
 				.length(length)
-				.path(path)
 				.topLvl(topLvl)
 				.instance();
 	}

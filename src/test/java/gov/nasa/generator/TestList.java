@@ -22,7 +22,7 @@ public class TestList {
 	public void testSimpleObjectList() {
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).path("resources/").instance();
+			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
 			
 			List<List<B>> list = new ArrayList<List<B>>();
 			while(generator.hasNext()){
@@ -48,7 +48,7 @@ public class TestList {
 	public void testNestedObjectList() {
 		try {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).path("resources/").instance();
+			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
 			
 			List<List<C>> list = new ArrayList<List<C>>();
 			while(generator.hasNext()){

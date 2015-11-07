@@ -3,3 +3,4 @@
 .project
 .settings
 ivy-dependencies/
+*.atxa

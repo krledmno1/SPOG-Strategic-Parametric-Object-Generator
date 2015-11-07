@@ -1,7 +1,9 @@
 package gov.nasa.generator.generators;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVReader;
+import gov.nasa.generator.annotations.Generate;
 import gov.nasa.generator.generators.NumberGenerator.TypeWrapper;
 
 public class ClassGenerator<T> extends AbstractGenerator<T> {
@@ -44,22 +47,21 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 	
 	protected ClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) throws ParseException, GenerationException {
 		super(b);
-		//read file
-		String csvPath=path+clazz.getSimpleName()+".csv";
-		List<Map<Field,TypeWrapper<Number>>> bounds = read(csvPath);
 		
 		//get all the declared fields in the class and all non private fields
 		//in all superclasses		
 		Class<?> current = clazz;
 		Deque<Field> fields = new ArrayDeque<Field>();
 		for (Field field : current.getDeclaredFields()) {
-			fields.add(field);
+			if(generable(field) || !isPrimitive(field)){
+				fields.add(field);
+			}
 		}
 		current = current.getSuperclass();		
 		List<Field> currentfields = new ArrayList<Field>();
 		while(current.getSuperclass()!=null){ // we don't want to process Object.class
 			for (Field field : current.getDeclaredFields()) {
-				if(!Modifier.isPrivate(field.getModifiers())){
+				if(!Modifier.isPrivate(field.getModifiers()) && (generable(field)|| !isPrimitive(field))){
 					currentfields.add(field);
 				}
 			}
@@ -79,7 +81,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		int i=0;
 		for (Field field : fieldList) {
 			//assign generators
-			assignGenerators(field,bounds);
+			assignGenerators(field);
 			
 			//get parameter list for the constructor
 			params[i]=field.getType();
@@ -111,29 +113,60 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 	
 	
 	
+	private boolean generable(Field field) {
+		Generate generate = null;
+		for(Annotation annotation : field.getAnnotations()) {
+			if(annotation.annotationType() == Generate.class) {
+				generate=(Generate)annotation;
+			}
+
+		}
+		return generate!=null;
+	}
+
+	private boolean isPrimitive(Field field) {
+		//TODO: what if user inherits Number
+		return Number.class.isAssignableFrom(field.getType());
+	}
+
+
+
 	//TODO: change its  return type to AbstractGenerator and move it to AbstractGenerator
 	//potentially can be reused.
-	private void assignGenerators(Field field, 
-								  List<Map<Field, TypeWrapper<Number>>> bounds) 
+	private <K extends Number> void assignGenerators(Field field) 
 										  throws ParseException, GenerationException {
 		
-		TypeWrapper<Number> min = bounds.get(0).get(field);
-		TypeWrapper<Number> max = bounds.get(1).get(field); 
-		TypeWrapper<Number> step = bounds.get(2).get(field);
+		Generate generate = null;
+		for(Annotation annotation : field.getAnnotations()) {
+			if(annotation.annotationType() == Generate.class) {
+				generate=(Generate)annotation;
+			}
+
+		}
+
 		
-		if(min!=null && max!=null && step!=null){
-			//Primitive types
+		if(generate!=null){
+			//Primitive types (we assume that only primitive types are (possibly) annotated)
+			String type = field.getType().getSimpleName().toUpperCase();
+			TypeWrapper<K> min = TypeWrapper.extractValue(generate.min(), type);
+			TypeWrapper<K> max = TypeWrapper.extractValue(generate.max(), type);
+			TypeWrapper<K> step = TypeWrapper.extractValue(generate.step(), type);
+			
 			generators.put(field,
 						   NumberGenerator.builder(field.getType(),
 												   strategy, 
 												   min, max, 
 												   step).depth(depth)
 						   								.length(length)
-						   								.path(path)
 						   								.instance());
 			return;
 		}
+		if(isPrimitive(field)){
+			//Skip unannotated primitive fields
+			return;
+		}
 		if(Collection.class.isAssignableFrom(field.getType())){
+			//lists
 			
 			ParameterizedType pt = (ParameterizedType) field.getGenericType();
 			Class<?> genericClass = (Class<?>) pt.getActualTypeArguments()[0];
@@ -142,7 +175,6 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 														strategy)
 														.depth(depth)
 														.length(length)
-														.path(path)
 														.topLvl(topLvl)
 														.instance());
 			return;
@@ -159,7 +191,6 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 					strategy)
 					.depth(depth)
 					.length(length)
-					.path(path)
 					.topLvl(topLvl)
 					.instance());
 			
@@ -171,13 +202,18 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 													strategy)
 													.depth(depth)
 													.length(length)
-													.path(path)
 													.topLvl(topLvl)
 													.instance());
 		return;
 		
 		
 	}
+
+	
+
+
+
+
 
 	//implementation of abstract methods
 	public T generate() throws ParseException, GenerationException{
@@ -204,100 +240,9 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		return builder(clazz, strategy)
 				.depth(depth)
 				.length(length)
-				.path(path)
 				.topLvl(topLvl)
 				.instance();
 	}
-
-	
-	
-	
-	
-	/**
-	 * This method reads the CSV file and parses MIN, MAX, and STEP values
-	 * It checks if the csv file has the right format:
-	 * <field name>, <field type>, <value range>
-	 * where 
-	 * <field name> MUST match the field name of T
-	 * <field type> MUST match the field type of <field name> of T
-	 * and <value range> is of the form:
-	 * [num_1 to num_2 step num_3] 
-	 * or
-	 * [num_1 , num_2]
-	 * where num_i is a number and
-	 * num_1 is min value for the parameter
-	 * num_2 is max value for the parameter
-	 * num_3 is the step increase value for the parameter (default 1)
-	 * @param <K>
-	 * 
-	 *
-	 * @throws ParseException in the following cases:
-	 * 1. if csv is not the right format
-	 * 2. if <field name> does not exists in T
-	 * 3. if <field type> is not the type of the <field name> in T
-	 * 4. if csv file cannot be found
-	 *
-	 */
-	private <K extends Number> List<Map<Field,TypeWrapper<K>>> read(String pathToCSV) throws ParseException{
-		try {
-			Map<Field,TypeWrapper<K>> min=new HashMap<Field, TypeWrapper<K>>();
-			Map<Field,TypeWrapper<K>> max=new HashMap<Field, TypeWrapper<K>>();
-			Map<Field,TypeWrapper<K>> step=new HashMap<Field, TypeWrapper<K>>();
-			
-			
-			CSVReader reader = new CSVReader(new FileReader(pathToCSV));
-			String [] nextLine;
-			int line = 1;
-			while ((nextLine = reader.readNext()) != null) {
-				//check if there are 3 columns in each csv row
-				if(nextLine.length==3){
-					String name = nextLine[0];
-					String type = nextLine[1];
-					String values = nextLine[2];
-					
-					//check if name exists 
-					try {
-						Field field = clazz.getDeclaredField(name);
-						//check if the type is correct
-						if(field.getType().getSimpleName().toUpperCase().equals(type.toUpperCase())){
-							//extract bounds
-							TypeWrapper<K>[] bounds = TypeWrapper.extractBounds(values,type);
-							//put them into the HashMaps
-							min.put(field, bounds[0]);
-							max.put(field, bounds[1]);
-							step.put(field, bounds[2]);
-						}
-						else{
-					   		reader.close();
-					   		throw new ParseException("Incorrect type: " + type + " expected: " + field.getType().getSimpleName(), line);						
-						}
-						
-					} catch (NoSuchFieldException | SecurityException e) {
-						reader.close();
-						throw new ParseException("No such filed: " + name + " in " + clazz.getName(), line);
-					} 
-				}
-				else{
-					reader.close();
-					throw new ParseException("Lines shoud contain 3 members", line);
-				}
-			    line++;
-			}
-			reader.close();
-			List<Map<Field,TypeWrapper<K>>> list = new ArrayList<Map<Field,TypeWrapper<K>>>(3);
-			list.add(min);
-			list.add(max);
-			list.add(step);
-			return list;
-			
-		} catch (IOException e1) {
-			throw new ParseException("File could not be found or read: "+ pathToCSV, 0);
-		}
-	}
-
-
-
-
 
 
 	public T construct(Object[] values) throws GenerationException {

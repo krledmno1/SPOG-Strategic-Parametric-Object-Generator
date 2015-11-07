@@ -61,7 +61,7 @@ public class TestNumber extends TestCase {
 		
 		AbstractGenerator<Double> generator = NumberGenerator.builder(
 														Double.class, strategy,
-														min, max, step).path("resources/")
+														min, max, step)
 														.instance();
 		
 		List<Double> list = new ArrayList<Double>();

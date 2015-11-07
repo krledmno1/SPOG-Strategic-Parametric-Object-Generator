@@ -2,10 +2,12 @@ package gov.nasa.generator;
 
 import java.text.ParseException;
 
+import gov.nasa.generator.examples.A;
 import gov.nasa.generator.examples.Abstract;
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
 import gov.nasa.generator.examples.CompositeObject;
+import gov.nasa.generator.examples.D;
 import gov.nasa.generator.examples.Encapsulator;
 import gov.nasa.generator.generators.AbstractClassGenerator;
 import gov.nasa.generator.generators.AbstractGenerator;
@@ -35,7 +37,7 @@ public class App
 	    		AbstractGenerator<Integer> generator = NumberGenerator.builder(
 	    														Integer.class, strategy,
 																min, max, step)
-																.path("resources/").instance();
+																.instance();
 	    		
 	    		while(generator.hasNext())
 	    			System.out.println(generator.generate());
@@ -57,7 +59,7 @@ public class App
 	    		AbstractGenerator<Double> generator = NumberGenerator.builder(
 															Double.class, strategy,
 															min, max, step)
-	    													.path("resources/").instance();
+	    													.instance();
     		
     		while(generator.hasNext())
     			System.out.println(generator.generate());
@@ -70,8 +72,37 @@ public class App
 	
 	private static void simpleObjectExample(){
 		try {
+				GenerationStrategy<A> strategy= new CartesianStrategy<A>();
+				AbstractGenerator<A> generator = ClassGenerator.builder(A.class, strategy).instance();
+				
+				while(generator.hasNext())
+					System.out.println(generator.generate());
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	private static void simpleTwoFieldObjectExample(){
+		try {
 				GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-				AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).path("resources/").instance();
+				AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
+				
+				while(generator.hasNext())
+					System.out.println(generator.generate());
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	private static void simpleIgnoreFieldObjectExample(){
+		try {
+				GenerationStrategy<D> strategy= new CartesianStrategy<D>();
+				AbstractGenerator<D> generator = ClassGenerator.builder(D.class, strategy).instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -85,7 +116,7 @@ public class App
 	private static void nestedObjectExample(){
 		try {
 				GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-				AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).path("resources/").instance();
+				AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -98,10 +129,10 @@ public class App
 	
 	
 	
-	private static void simpleobjectListExample(){
+	private static void simpleObjectListExample(){
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).path("resources/").instance();
+			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -116,7 +147,7 @@ public class App
 	private static void nestedObjectListExample(){
 		try {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).path("resources/").instance();
+			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -130,7 +161,7 @@ public class App
 	private static void abstractClassExample(){
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
-			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).path("resources/").instance();
+			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -147,19 +178,13 @@ public class App
 
 			AbstractGenerator<Encapsulator> generator =  
 					ClassGenerator.builder(Encapsulator.class, strategy)
-					.path("resources/")
-					
 					.instance();
 			
-			int i = 1;
 			while(generator.hasNext()){
-				System.out.println(i);
 				System.out.println(generator.generate());
-				i++;
 			}
 
 		} catch (ParseException | GenerationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -172,7 +197,6 @@ public class App
 
 			AbstractGenerator<CompositeObject> generator =  
 					ClassGenerator.builder(CompositeObject.class, strategy)
-					.path("resources/hierarchy/")
 					.depth(3)
 					.instance();
 			
@@ -194,14 +218,16 @@ public class App
     public static void main( String[] args )
     {
     	
-//    	integerExample();
-//    	doubleExample();
+    	integerExample();
+    	doubleExample();
     	simpleObjectExample();
-//    	nestedObjectExample();
-//    	simpleobjectListExample();
-//    	nestedObjectListExample();
-//    	abstractClassExample();
-//    	abstractClassEncapsulatedExamlple();
+    	simpleTwoFieldObjectExample();
+    	simpleIgnoreFieldObjectExample();
+    	nestedObjectExample();
+    	simpleObjectListExample();
+    	nestedObjectListExample();
+    	abstractClassExample();
+    	abstractClassEncapsulatedExamlple();
 //    	abstractRecursiveClassEncapsulatedExamlple();
 		
     	

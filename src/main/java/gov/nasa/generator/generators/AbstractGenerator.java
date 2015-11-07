@@ -9,7 +9,6 @@ public abstract class AbstractGenerator<T> {
 	protected GenerationStrategy<T> strategy;
 	
 	//optional with default values
-	protected String path;
 	protected int depth; 
 	protected int length;
 	protected boolean topLvl;
@@ -25,7 +24,6 @@ public abstract class AbstractGenerator<T> {
 		private GenerationStrategy<T> strategy;
 		
 		//optional with default values
-		private String path="";
 		private int depth=2; 
 		private int length=2;
 		private boolean topLvl=true;
@@ -34,11 +32,6 @@ public abstract class AbstractGenerator<T> {
 		public Build(Class<T> c, GenerationStrategy<T> s){
 			clazz=c;
 			strategy=s;
-		}
-		
-		public Build<T> path(String p){
-			path=p;
-			return this;
 		}
 		
 		public Build<T> depth(int d){
@@ -62,7 +55,6 @@ public abstract class AbstractGenerator<T> {
 	protected AbstractGenerator(Build<T> b){
 		clazz=b.clazz;
 		strategy=b.strategy;
-		path=b.path;
 		depth=b.depth;
 		length=b.length;
 		topLvl=b.topLvl;

@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import gov.nasa.generator.generators.NumberGenerator.TypeWrapper;
+
 
 public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 
@@ -52,26 +54,27 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 		public TypeWrapper<K> cloneValue();
 		public K getValue();
 		public TypeWrapper<K> mult(IntWrapper intWrapper);
-		public static <K extends Number> TypeWrapper<K>[] extractBounds(String values, String type) throws ParseException{
-			type = type.toUpperCase();
-			switch(type){
-				case "DOUBLE":{
-					return (TypeWrapper<K>[]) DoubleWrapper.extractBounds(values);
-				}
-				case "INTEGER":{
-					return (TypeWrapper<K>[]) IntWrapper.extractBounds(values);
-				}
-				default:{
-					throw new ParseException("Type " + type + " not supported", 0);
-				}
-			}
-		}
+		
 		public static boolean supports(String type){
 			Set<String> supported = new HashSet<String>();
 			supported.add(Integer.class.getSimpleName().toUpperCase());
 			supported.add(Double.class.getSimpleName().toUpperCase());
 			
 			return supported.contains(type.toUpperCase());
+		}
+		public static <K extends Number> TypeWrapper<K> extractValue(String value, String type) throws ParseException{
+			type = type.toUpperCase();
+			switch(type){
+				case "DOUBLE":{
+					return (TypeWrapper<K>) DoubleWrapper.extractValue(value);
+				}
+				case "INTEGER":{
+					return (TypeWrapper<K>) IntWrapper.extractValue(value);
+				}
+				default:{
+					throw new ParseException("Type " + type + " not supported", 0);
+				}
+			}
 		}
 		
 	}
@@ -80,36 +83,8 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 		public IntWrapper(Integer v) {
 			value=v;
 		}
-		public static IntWrapper[] extractBounds(String array) throws ParseException {
-			try{
-			    if (!(array.contains("to") && array.contains("step"))) {
-			    	
-			    	String[] res = array.substring(1, array.length() - 1).trim()
-			                .split(",");
-			    	int start = Integer.parseInt(res[0].trim());
-				    int end = Integer.parseInt(res[1].trim());
-				    
-				    return new IntWrapper[] {new IntWrapper(start), 
-				    						 new IntWrapper(end),
-				    						 new IntWrapper(1)};
-		
-			    }
-			
-			    String[] res = array.substring(1, array.length() - 1).trim()
-			        .split("to|step");
-			
-			    int start = Integer.parseInt(res[0].trim());
-			    int end = Integer.parseInt(res[1].trim());
-			    int step = Integer.parseInt(res[2].trim());
-			
-			    return new IntWrapper[] {new IntWrapper(start), 
-			    						 new IntWrapper(end), 
-			    						 new IntWrapper(step)};
-			    
-			}
-			catch (Exception e){
-				throw new ParseException("Malformed number", 0); 
-			}
+		public static IntWrapper extractValue(String value) throws ParseException  {
+			return new IntWrapper(Integer.parseInt(value));
 		}
 		@Override
 		public Integer getValue() {
@@ -172,33 +147,8 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 		public DoubleWrapper(Double v) {
 			value=v;
 		}
-		public static DoubleWrapper[] extractBounds(String array) throws ParseException {
-			try{
-			    if (!(array.contains("to") && array.contains("step"))) {
-			    	
-			    	String[] res = array.substring(1, array.length() - 1).trim()
-			                .split(",");
-			    	double start = Double.parseDouble(res[0].trim());
-			    	double end = Double.parseDouble(res[1].trim());
-				    
-				    return new DoubleWrapper[] {new DoubleWrapper(start), 
-				    							new DoubleWrapper(end), 
-				    							new DoubleWrapper(1.0)};
-			    }
-			
-			    String[] res = array.substring(1, array.length() - 1).trim()
-			        .split("to|step");
-			
-			    double start = Double.parseDouble(res[0].trim());
-			    double end = Double.parseDouble(res[1].trim());
-			    double step = Double.parseDouble(res[2].trim());
-			
-			    return new DoubleWrapper[] {new DoubleWrapper(start),
-			    							new DoubleWrapper(end),
-			    							new DoubleWrapper(step)};
-			} catch(Exception e){
-				throw new ParseException("Malformed number", 0); 
-			}
+		public static DoubleWrapper extractValue(String value) throws ParseException  {
+			return new DoubleWrapper(Double.parseDouble(value));
 		}
 		@Override
 		public Double getValue() {
@@ -309,7 +259,6 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 		return builder(clazz, strategy,min,max,step)
 				.depth(depth)
 				.length(length)
-				.path(path)
 				.topLvl(topLvl)
 				.instance();
 	}

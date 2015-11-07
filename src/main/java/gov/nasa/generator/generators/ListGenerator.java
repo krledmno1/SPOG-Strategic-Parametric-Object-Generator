@@ -39,7 +39,6 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 											strategy)
 											.depth(depth)
 											.length(length)
-											.path(path)
 											.topLvl(topLvl)
 											.instance();
 		reset();
@@ -71,7 +70,6 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 		return builder(clazz, strategy)
 				.depth(depth)
 				.length(length)
-				.path(path)
 				.topLvl(topLvl)
 				.instance();
 	}

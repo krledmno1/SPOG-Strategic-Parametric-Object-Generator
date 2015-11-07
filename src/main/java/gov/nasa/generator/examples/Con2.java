@@ -3,13 +3,18 @@
  */
 package gov.nasa.generator.examples;
 
+import gov.nasa.generator.annotations.Generate;
+
 /**
  * @author Srdan Krstic (srdan.krstic@polimi.it)
  *
  */
 public class Con2 extends AbstractClass {
 
+	@Generate(min = "0", max="2", step = "1")
 	private Double a1;
+	
+	@Generate(min = "0", max="1", step = "1")
 	private Double a2;
 
 	public Con2(Double a1, Double a2) {

@@ -12,7 +12,7 @@ package gov.nasa.generator.examples;
  */
 public abstract class AbstractClass{
 
-	//Ignored by generation (you must set it in the constructor of subclasses)
+	//Ignored by generation since it's private (you must set it in the constructor of subclasses)
 	private String name;
 
 	
