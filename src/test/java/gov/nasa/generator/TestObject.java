@@ -24,14 +24,14 @@ public class TestObject {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
 			AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
 			
-			List<B> list = new ArrayList<B>();
+			int count=0;
 			while(generator.hasNext()){
 				B object = (B) generator.generate();
 //				System.out.println(object);
-				list.add(object);
+				count++;
 			}
 			
-			assertEquals("Number of simple objects", 10, list.size());
+			assertEquals("Number of simple objects", 10, count);
 		
 			} catch (ParseException | GenerationException e) {
 		        assertTrue( "Exception!",  false );
@@ -45,14 +45,14 @@ public class TestObject {
 					GenerationStrategy<C> strategy= new CartesianStrategy<C>();
 					AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
 					
-					List<C> list = new ArrayList<C>();
+					int count=0;
 					while(generator.hasNext()){
 						C object = (C) generator.generate();
 //						System.out.println(object);
-						list.add(object);
+						count++;
 					}
 					
-					assertEquals("Number of nested objects", 5, list.size());
+					assertEquals("Number of nested objects", 5, count);
 
 				
 			} catch (ParseException | GenerationException e) {

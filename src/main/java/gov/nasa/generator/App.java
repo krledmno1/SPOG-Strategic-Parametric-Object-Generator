@@ -197,7 +197,7 @@ public class App
 
 			AbstractGenerator<CompositeObject> generator =  
 					ClassGenerator.builder(CompositeObject.class, strategy)
-					.depth(3)
+					.depth(2)
 					.instance();
 			
 			int i = 1;
@@ -218,17 +218,17 @@ public class App
     public static void main( String[] args )
     {
     	
-    	integerExample();
-    	doubleExample();
-    	simpleObjectExample();
-    	simpleTwoFieldObjectExample();
-    	simpleIgnoreFieldObjectExample();
-    	nestedObjectExample();
-    	simpleObjectListExample();
-    	nestedObjectListExample();
-    	abstractClassExample();
-    	abstractClassEncapsulatedExamlple();
-//    	abstractRecursiveClassEncapsulatedExamlple();
+//    	integerExample();
+//    	doubleExample();
+//    	simpleObjectExample();
+//    	simpleTwoFieldObjectExample();
+//    	simpleIgnoreFieldObjectExample();
+//    	nestedObjectExample();
+//    	simpleObjectListExample();
+//    	nestedObjectListExample();
+//    	abstractClassExample();
+//    	abstractClassEncapsulatedExamlple();
+    	abstractRecursiveClassEncapsulatedExamlple();
 		
     	
     	

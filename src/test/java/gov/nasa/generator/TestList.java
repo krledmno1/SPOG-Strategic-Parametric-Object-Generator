@@ -24,14 +24,14 @@ public class TestList {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
 			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
 			
-			List<List<B>> list = new ArrayList<List<B>>();
+			int count=0;
 			while(generator.hasNext()){
 				List<B> object = (List<B>) generator.generate();
 //				System.out.println(object);
-				list.add(object);
+				count++;
 			}
 			
-			assertEquals("Number of lists with simple objects", 5*2+10*10+10*10*10, list.size());
+			assertEquals("Number of lists with simple objects", 5*2+10*10+10*10*10, count);
 
 			
 		} catch (ParseException | GenerationException e) {
@@ -50,14 +50,14 @@ public class TestList {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
 			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
 			
-			List<List<C>> list = new ArrayList<List<C>>();
+			int count=0;
 			while(generator.hasNext()){
 				List<C> object = (List<C>) generator.generate();
 //				System.out.println(object);
-				list.add(object);
+				count++;
 			}
 			
-			assertEquals("Number of lists with simple objects", 5+5*5+5*5*5, list.size());
+			assertEquals("Number of lists with simple objects", 5+5*5+5*5*5, count);
 
 			
 		} catch (ParseException | GenerationException e) {

@@ -31,14 +31,14 @@ public class TestNumber extends TestCase {
 														min, max, step)
 														.instance();
 		
-		List<Integer> list = new ArrayList<Integer>();
+		int count=0;
 		while(generator.hasNext()){
 			Integer obj = (Integer) generator.generate();
 //			System.out.println(obj);
-			list.add(obj);
+			count++;
 		}
 		
-		assertEquals("Number of generatod objects", 3, list.size());
+		assertEquals("Number of generatod objects", 3, count);
 	
 		} catch (ParseException | GenerationException e) {
 			e.printStackTrace();
@@ -64,14 +64,14 @@ public class TestNumber extends TestCase {
 														min, max, step)
 														.instance();
 		
-		List<Double> list = new ArrayList<Double>();
+		int count=0;
 		while(generator.hasNext()){
 			Double obj = (Double) generator.generate();
 //			System.out.println(obj);
-			list.add(obj);
+			count++;
 		}
 		
-		assertEquals("Number of generatod objects", 5, list.size());
+		assertEquals("Number of generatod objects", 5, count);
 	
 		} catch (ParseException | GenerationException e) {
 			e.printStackTrace();
