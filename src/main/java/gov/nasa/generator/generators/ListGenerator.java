@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.nasa.generator.configurations.InputConf;
+
 
 public class ListGenerator<T> extends AbstractGenerator<T> {
 
@@ -72,6 +74,13 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 				.length(length)
 				.topLvl(topLvl)
 				.instance();
+	}
+
+
+
+	@Override
+	protected void visit(InputConf config) {
+		generator.visit(config);
 	}
 	
 }

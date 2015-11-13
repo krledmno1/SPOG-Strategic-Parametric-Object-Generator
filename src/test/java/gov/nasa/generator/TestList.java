@@ -10,8 +10,10 @@ import org.junit.Test;
 
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
+import gov.nasa.generator.examples.ListEx;
 import gov.nasa.generator.generators.AbstractGenerator;
 import gov.nasa.generator.generators.CartesianStrategy;
+import gov.nasa.generator.generators.ClassGenerator;
 import gov.nasa.generator.generators.GenerationException;
 import gov.nasa.generator.generators.GenerationStrategy;
 import gov.nasa.generator.generators.ListGenerator;
@@ -67,5 +69,31 @@ public class TestList {
 		}
 		
 	}
+	
+	
+	@Test
+	public void testSimpleObjectListExample(){
+		try {
+			CartesianStrategy<ListEx> strategy = new CartesianStrategy<ListEx>();
+
+			AbstractGenerator<ListEx> generator =  
+					ClassGenerator.builder(ListEx.class, strategy)
+					.instance();
+			
+			int count = 0;
+			while(generator.hasNext()){
+				ListEx object = (ListEx) generator.generate();
+				count++;
+			}
+
+			
+			assertEquals("Number of objects with simple lists", 5+5*5, count);
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+			assertTrue( "Exception!",  false );
+		}
+	}
+
 
 }

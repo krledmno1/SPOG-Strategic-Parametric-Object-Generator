@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
+import gov.nasa.generator.configurations.InputConf;
+
 public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 
 	public static class AbstractClassBuilder<T> extends AbstractGenerator.Build<T>{
@@ -141,6 +143,13 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 				.length(length)
 				.topLvl(topLvl)
 				.instance();
+	}
+
+	@Override
+	protected void visit(InputConf config) {
+		for (AbstractGenerator<T> abstractGenerator : generators) {
+			abstractGenerator.checkAndVisit(config);
+		}
 	}
 
 

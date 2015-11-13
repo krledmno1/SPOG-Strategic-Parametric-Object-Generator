@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import gov.nasa.generator.configurations.InputConf;
 import gov.nasa.generator.generators.NumberGenerator.TypeWrapper;
 
 
@@ -261,6 +262,11 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 				.length(length)
 				.topLvl(topLvl)
 				.instance();
+	}
+
+	@Override
+	protected void visit(InputConf config) {
+		//should never be called
 	}
 
 	

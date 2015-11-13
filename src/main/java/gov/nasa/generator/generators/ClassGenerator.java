@@ -5,9 +5,42 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import gov.nasa.generator.configurations.InputConf;
 
 
+/**
+ * @author Srdan Krstic (srdan.krstic@polimi.it)
+ * This class implements AbstractGenerator interface 
+ * for class user objects. User must instantiate 
+ * ClassGenerator to generate objects of his/her
+ * custom class T. T is assumed to be annotated with 
+ * @Generate annotations
+ * 
+ * Class requirements:
+ * 
+ * 1. It implements the AbstractGenerator interface 
+ * as simple calls to the abstract strategy and
+ * passing itself as parameter. Each generation 
+ * strategy must implement  AbstractGenerator interface 
+ * for each parameterized by the Generator type.  
+ * 
+ * 2. It is responsible for analyzing all non private 
+ * fields of the class T and creating and keeping an 
+ * appropriate generator for every field.
+ * 
+ * 3. It is responsible for initializing parameters
+ * min, max and step for every field from different sources.
+ * Default sources are @Generate annotations, but user can specify
+ * custom sources (csv, commons conf, ...).
+ * 
+ * 
+ *
+ * @param <T> - Class type to be generated (assumes it has been annotated with @Generate)
+ */
 public class ClassGenerator<T> extends AbstractGenerator<T> {
 
 	public static class ClassBuilder<T> extends AbstractGenerator.Build<T>{
@@ -110,6 +143,30 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 					| InvocationTargetException e) {
 				throw new GenerationException("Cannot instantiate type " + clazz);
 			}
+		
+	}
+
+	
+	@Override
+	protected void visit(InputConf config) {
+		
+		for (Field field : fieldList) {
+			if(isPrimitive(field)){
+				if(config!=null){
+					config.writeMin(generateFieldKey(field), "");
+					config.writeMax(generateFieldKey(field), "");
+					config.writeStep(generateFieldKey(field), "");
+				}
+				else{
+					System.out.println(generateFieldKey(field)+".min"+"=");
+					System.out.println(generateFieldKey(field)+".max"+"=");
+					System.out.println(generateFieldKey(field)+".step"+"=");
+				}
+			}
+			else{
+				generators.get(field).checkAndVisit(config);
+			}
+		}
 		
 	}
 

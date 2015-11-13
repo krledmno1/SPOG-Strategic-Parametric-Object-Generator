@@ -9,9 +9,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import gov.nasa.generator.annotations.Generate;
+import gov.nasa.generator.configurations.InputConf;
 import gov.nasa.generator.generators.NumberGenerator.TypeWrapper;
 
 public abstract class AbstractGenerator<T> {
@@ -21,6 +24,7 @@ public abstract class AbstractGenerator<T> {
 	protected GenerationStrategy<T> strategy;
 	
 	//optional with default values
+	protected InputConf input;
 	protected int depth; 
 	protected int length;
 	protected boolean topLvl;
@@ -36,6 +40,7 @@ public abstract class AbstractGenerator<T> {
 		private GenerationStrategy<T> strategy;
 		
 		//optional with default values
+		private InputConf input = null;
 		private int depth=2; 
 		private int length=2;
 		private boolean topLvl=true;
@@ -44,6 +49,11 @@ public abstract class AbstractGenerator<T> {
 		public Build(Class<T> c, GenerationStrategy<T> s){
 			clazz=c;
 			strategy=s;
+		}
+		
+		public Build<T> config(InputConf i){
+			input=i;
+			return this;
 		}
 		
 		public Build<T> depth(int d){
@@ -68,6 +78,7 @@ public abstract class AbstractGenerator<T> {
 		
 		clazz=b.clazz;
 		strategy=b.strategy;
+		input=b.input;
 		depth=b.depth;
 		length=b.length;
 		topLvl=b.topLvl;
@@ -90,6 +101,14 @@ public abstract class AbstractGenerator<T> {
 	protected abstract AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException;
 		
 	
+	/**
+	 * Analyzes the class T and all its superclasses and returns a list of 
+	 * fields that T has declared or inherited in order of declaration 
+	 * starting from the most general superclass until class T
+	 * Object class is not considered.
+	 * 
+	 * @return sorted list of fields
+	 */
 	protected Field[] getAllFields() {
 		//get all the declared fields in the class and all non private fields
 		//in all superclasses
@@ -119,7 +138,24 @@ public abstract class AbstractGenerator<T> {
 	}
 	
 	
-	protected boolean generable(Field field) {
+	/**
+	 * Returns true if field should be considered in generation
+	 * 
+	 * @param field - field to check
+	 * @return true if if the field is associated with a generator
+	 */
+	private boolean generable(Field field) {
+		return  getGenerateAnnotation(field)!=null;
+	}
+	
+	/**
+	 * Returns @Generate annotation associated with the field
+	 * or null if field is not annotated
+	 * 
+	 * @param field - field for which generate annotation is queried
+	 * @return
+	 */
+	private Generate getGenerateAnnotation(Field field){
 		Generate generate = null;
 		for(Annotation annotation : field.getAnnotations()) {
 			if(annotation.annotationType() == Generate.class) {
@@ -127,9 +163,17 @@ public abstract class AbstractGenerator<T> {
 			}
 
 		}
-		return generate!=null;
+		return generate;
 	}
 
+	/**
+	 * 
+	 * Returns true if the field is primitive
+	 * Currently primitive fields can be of type Double or Integer 
+	 * 
+	 * @param field - field to check
+	 * @return true if field is primitive
+	 */
 	protected boolean isPrimitive(Field field) {
 		//TODO: what if user inherits Number
 		return Number.class.isAssignableFrom(field.getType());
@@ -147,6 +191,7 @@ public abstract class AbstractGenerator<T> {
 	protected <K extends Number> AbstractGenerator<?> assignGenerators(Field field) 
 										  throws ParseException, GenerationException {
 		
+		//Is there the @Generate annotation?
 		Generate generate = null;
 		for(Annotation annotation : field.getAnnotations()) {
 			if(annotation.annotationType() == Generate.class) {
@@ -155,14 +200,17 @@ public abstract class AbstractGenerator<T> {
 
 		}
 
-		
+		//If there is one read from the configuration
 		if(generate!=null){
 			//Primitive types (we assume that only primitive types are (possibly) annotated)
 			//TODO: this will change when we annotate also non-primitive types
 			String type = field.getType().getSimpleName().toUpperCase();
-			TypeWrapper<K> min = TypeWrapper.extractValue(generate.min(), type);
-			TypeWrapper<K> max = TypeWrapper.extractValue(generate.max(), type);
-			TypeWrapper<K> step = TypeWrapper.extractValue(generate.step(), type);
+			
+			String key = generateFieldKey(field);
+			
+			TypeWrapper<K> min = TypeWrapper.extractValue(input!=null ? input.readMin(key) : generate.min(), type);
+			TypeWrapper<K> max = TypeWrapper.extractValue(input!=null ? input.readMax(key) : generate.max(), type);
+			TypeWrapper<K> step = TypeWrapper.extractValue(input!=null ? input.readStep(key) : generate.step(), type);
 			
 			return NumberGenerator.builder(field.getType(),
 					   strategy, 
@@ -219,5 +267,72 @@ public abstract class AbstractGenerator<T> {
 		
 	}
 
+
+	/**
+	 * Generated a unique string key that identifies a field
+	 * 
+	 * @param field - field for which we want to generate key
+	 * @return unique string key
+	 */
+	protected String generateFieldKey(Field field) {
+		return clazz.getName()+field.getName();
+	}
+
+	
+
+	
+	
+	/**
+	 * Write default configuration template
+	 * on the standard output
+	 */
+	public void writeConfigTemplate(){
+		writeConfigTemplate(null);
+	}
+
+
+	/**
+	 * Write configuration template using the 
+	 * config as a method. The format depends on the
+	 * Input config class.
+	 * 
+	 * @param config - Input config object, defines 
+	 * format and write method for the template
+	 *   
+	 */
+	public void writeConfigTemplate(InputConf config){
+		visited = null;
+		checkAndVisit(config);
+		
+	}
+	
+	private static Set<Class<?>> visited = null;
+
+	/**
+	 * Initialized a static data structure used to make sure 
+	 * that every class is visited only once
+	 * 
+	 * @param config - config object defines format and write method
+	 */
+	protected void checkAndVisit(InputConf config){
+		if(visited==null){
+			visited = new HashSet<Class<?>>();
+		}
+		
+		if(!visited.contains(clazz)){
+			visited.add(clazz);
+			visit(config);
+		}
+		
+	}
+
+
+	/**
+	 * Visits a particular Generator
+	 * without checking if it was visited before
+	 * 
+	 * @param config - config object defines format and write method
+	 */
+	abstract protected void visit(InputConf config);
 
 }
