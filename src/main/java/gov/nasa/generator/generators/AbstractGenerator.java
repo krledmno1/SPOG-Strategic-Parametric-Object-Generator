@@ -149,7 +149,7 @@ public abstract class AbstractGenerator<T> {
 	}
 	
 	/**
-	 * Returns @Generate annotation associated with the field
+	 * Returns Generate annotation associated with the field
 	 * or null if field is not annotated
 	 * 
 	 * @param field - field for which generate annotation is queried
@@ -183,6 +183,7 @@ public abstract class AbstractGenerator<T> {
 	/**
 	 * The method assigns a generator to a field depending on its type
 	 * @param field - field of the clazz
+	 * @param <K> - primitive type parameter 
 	 * @return AbstractGenerator associated to the field
 	 * @throws ParseException - thrown if the annotations are not valid strings
 	 * @throws GenerationException - thrown if the class does not have a valid structure 

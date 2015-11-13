@@ -18,7 +18,7 @@ import gov.nasa.generator.configurations.InputConf;
  * for class user objects. User must instantiate 
  * ClassGenerator to generate objects of his/her
  * custom class T. T is assumed to be annotated with 
- * @Generate annotations
+ * Generate annotations
  * 
  * Class requirements:
  * 
@@ -34,12 +34,12 @@ import gov.nasa.generator.configurations.InputConf;
  * 
  * 3. It is responsible for initializing parameters
  * min, max and step for every field from different sources.
- * Default sources are @Generate annotations, but user can specify
+ * Default sources are Generate annotations, but user can specify
  * custom sources (csv, commons conf, ...).
  * 
  * 
  *
- * @param <T> - Class type to be generated (assumes it has been annotated with @Generate)
+ * @param <T> - Class type to be generated (assumes it has been annotated with Generate)
  */
 public class ClassGenerator<T> extends AbstractGenerator<T> {
 
