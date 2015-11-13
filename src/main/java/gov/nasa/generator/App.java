@@ -2,6 +2,7 @@ package gov.nasa.generator;
 
 import java.text.ParseException;
 
+
 import gov.nasa.generator.examples.A;
 import gov.nasa.generator.examples.Abstract;
 import gov.nasa.generator.examples.B;
@@ -9,6 +10,7 @@ import gov.nasa.generator.examples.C;
 import gov.nasa.generator.examples.CompositeObject;
 import gov.nasa.generator.examples.D;
 import gov.nasa.generator.examples.Encapsulator;
+import gov.nasa.generator.examples.ListEx;
 import gov.nasa.generator.generators.AbstractClassGenerator;
 import gov.nasa.generator.generators.AbstractGenerator;
 import gov.nasa.generator.generators.CartesianStrategy;
@@ -212,6 +214,30 @@ public class App
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
+	private static void simpleObjectWithList(){
+		try {
+			
+			CartesianStrategy<ListEx> strategy = new CartesianStrategy<ListEx>();
+
+			AbstractGenerator<ListEx> generator =  
+					ClassGenerator.builder(ListEx.class, strategy)
+					.instance();
+			
+			int i = 1;
+			while(generator.hasNext()){
+				System.out.println(i);
+				System.out.println(generator.generate());
+				i++;
+			}
+
+		} catch (ParseException | GenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 	
@@ -228,9 +254,8 @@ public class App
 //    	nestedObjectListExample();
 //    	abstractClassExample();
 //    	abstractClassEncapsulatedExamlple();
-    	abstractRecursiveClassEncapsulatedExamlple();
-		
-    	
+//    	abstractRecursiveClassEncapsulatedExamlple();
+//    	simpleObjectWithList();
     	
     }
 }

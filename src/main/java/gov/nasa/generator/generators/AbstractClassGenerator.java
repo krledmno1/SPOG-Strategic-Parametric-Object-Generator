@@ -143,4 +143,6 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 				.instance();
 	}
 
+
+
 }
