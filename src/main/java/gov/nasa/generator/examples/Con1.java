@@ -6,7 +6,6 @@ package gov.nasa.generator.examples;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.nasa.generator.annotations.Generate;
 
 
 /**
@@ -17,13 +16,10 @@ public class Con1 extends AbstractClass {
 
 	
 	
-	@Generate(min = "0", max="2", step = "1")
 	private Double a1;
 	
-	@Generate(min = "0", max="1", step = "1")
 	private Double a2;
 
-	@Generate(min = "0", max="0", step = "1")
 	private Double a3;
 
 	public Con1( Double a3,

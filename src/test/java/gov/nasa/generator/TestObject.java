@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import gov.nasa.generator.configurations.CommonsInput;
 import gov.nasa.generator.examples.A;
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
@@ -24,7 +25,11 @@ public class TestObject {
 	public void simpleObjectExample(){
 		try {
 				GenerationStrategy<A> strategy= new CartesianStrategy<A>();
-				AbstractGenerator<A> generator = ClassGenerator.builder(A.class, strategy).instance();
+				AbstractGenerator<A> generator = 
+						ClassGenerator.builder(A.class, 
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				int count = 0;
 				while(generator.hasNext()){
@@ -45,7 +50,11 @@ public class TestObject {
 	public void testTwoFieldSimpleObject() {
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
+			AbstractGenerator<B> generator = 
+					ClassGenerator.builder(B.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.instance();
 			
 			int count=0;
 			while(generator.hasNext()){
@@ -67,7 +76,11 @@ public class TestObject {
 	public void testSimpleIgnoreFieldObjectExample(){
 		try {
 				GenerationStrategy<D> strategy= new CartesianStrategy<D>();
-				AbstractGenerator<D> generator = ClassGenerator.builder(D.class, strategy).instance();
+				AbstractGenerator<D> generator = 
+						ClassGenerator.builder(D.class, 
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				int count=0;
 				while(generator.hasNext()){
@@ -90,7 +103,11 @@ public class TestObject {
 	public void testNestedObject() {	
 				try {
 					GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-					AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
+					AbstractGenerator<C> generator = 
+							ClassGenerator.builder(C.class, 
+									strategy)
+							.input(new CommonsInput("resources/params.properties"))
+							.instance();
 					
 					int count=0;
 					while(generator.hasNext()){

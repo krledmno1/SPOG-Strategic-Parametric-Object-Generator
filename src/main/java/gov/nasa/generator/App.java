@@ -2,26 +2,11 @@ package gov.nasa.generator;
 
 import java.text.ParseException;
 
-import gov.nasa.generator.configurations.CommonsInput;
-import gov.nasa.generator.examples.A;
-import gov.nasa.generator.examples.Abstract;
-import gov.nasa.generator.examples.AbstractClass;
-import gov.nasa.generator.examples.B;
-import gov.nasa.generator.examples.C;
-import gov.nasa.generator.examples.CompositeObject;
-import gov.nasa.generator.examples.D;
-import gov.nasa.generator.examples.Encapsulator;
-import gov.nasa.generator.examples.ListEx;
-import gov.nasa.generator.generators.AbstractClassGenerator;
-import gov.nasa.generator.generators.AbstractGenerator;
-import gov.nasa.generator.generators.CartesianStrategy;
-import gov.nasa.generator.generators.ClassGenerator;
-import gov.nasa.generator.generators.GenerationException;
-import gov.nasa.generator.generators.GenerationStrategy;
-import gov.nasa.generator.generators.ListGenerator;
-import gov.nasa.generator.generators.NumberGenerator;
-import gov.nasa.generator.generators.NumberGenerator.DoubleWrapper;
-import gov.nasa.generator.generators.NumberGenerator.IntWrapper;
+
+import gov.nasa.generator.configurations.*;
+import gov.nasa.generator.examples.*;
+import gov.nasa.generator.generators.*;
+import gov.nasa.generator.generators.NumberGenerator.*;
 
 /**
  * Hello world!
@@ -76,11 +61,17 @@ public class App
 	private static void simpleObjectExample(){
 		try {
 				GenerationStrategy<A> strategy= new CartesianStrategy<A>();
-				AbstractGenerator<A> generator = ClassGenerator.builder(A.class, strategy).instance();
+				AbstractGenerator<A> generator = 
+						ClassGenerator.builder(A.class, 
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
 			
+				
+				
 		} catch (ParseException | GenerationException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +82,11 @@ public class App
 	private static void simpleTwoFieldObjectExample(){
 		try {
 				GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-				AbstractGenerator<B> generator = ClassGenerator.builder(B.class, strategy).instance();
+				AbstractGenerator<B> generator = 
+						ClassGenerator.builder(B.class, 
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -108,7 +103,11 @@ public class App
 	private static void simpleIgnoreFieldObjectExample(){
 		try {
 				GenerationStrategy<D> strategy= new CartesianStrategy<D>();
-				AbstractGenerator<D> generator = ClassGenerator.builder(D.class, strategy).instance();
+				AbstractGenerator<D> generator = 
+						ClassGenerator.builder(D.class,
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -122,7 +121,11 @@ public class App
 	private static void nestedObjectExample(){
 		try {
 				GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-				AbstractGenerator<C> generator = ClassGenerator.builder(C.class, strategy).instance();
+				AbstractGenerator<C> generator = 
+						ClassGenerator.builder(C.class, 
+								strategy)
+						.input(new CommonsInput("resources/params.properties"))
+						.instance();
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
@@ -138,7 +141,11 @@ public class App
 	private static void simpleObjectListExample(){
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
+			AbstractGenerator<B> generator = 
+					ListGenerator.builder(B.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.length(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -153,7 +160,11 @@ public class App
 	private static void nestedObjectListExample(){
 		try {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
+			AbstractGenerator<C> generator = 
+					ListGenerator.builder(C.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.length(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -167,7 +178,11 @@ public class App
 	private static void abstractClassExample(){
 		try {
 			GenerationStrategy<AbstractClass> strategy= new CartesianStrategy<AbstractClass>();
-			AbstractGenerator<AbstractClass> generator = AbstractClassGenerator.builder(AbstractClass.class, strategy).depth(3).instance();
+			AbstractGenerator<AbstractClass> generator = 
+					AbstractClassGenerator.builder(AbstractClass.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.depth(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -180,7 +195,11 @@ public class App
 	private static void abstractRecursiveClassExample(){
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
-			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).instance();
+			AbstractGenerator<Abstract> generator = 
+					AbstractClassGenerator.builder(Abstract.class,
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.depth(3).instance();
 			
 			while(generator.hasNext())
 				System.out.println(generator.generate());
@@ -196,7 +215,9 @@ public class App
 			CartesianStrategy<Encapsulator> strategy = new CartesianStrategy<Encapsulator>();
 
 			AbstractGenerator<Encapsulator> generator =  
-					ClassGenerator.builder(Encapsulator.class, strategy)
+					ClassGenerator.builder(Encapsulator.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.instance();
 			
 			while(generator.hasNext()){
@@ -215,7 +236,9 @@ public class App
 			CartesianStrategy<CompositeObject> strategy = new CartesianStrategy<CompositeObject>();
 
 			AbstractGenerator<CompositeObject> generator =  
-					ClassGenerator.builder(CompositeObject.class, strategy)
+					ClassGenerator.builder(CompositeObject.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.depth(2)
 					.instance();
 			
@@ -241,7 +264,9 @@ public class App
 			CartesianStrategy<ListEx> strategy = new CartesianStrategy<ListEx>();
 
 			AbstractGenerator<ListEx> generator =  
-					ClassGenerator.builder(ListEx.class, strategy)
+					ClassGenerator.builder(ListEx.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.instance();
 			
 			int i = 1;
@@ -257,7 +282,20 @@ public class App
 		}
 	}
 
-
+	private static void generateTemplate() {
+		GenerationStrategy<A> strategy= new CartesianStrategy<A>();
+		try {
+			AbstractGenerator<A> generator = 
+					ClassGenerator.builder(A.class, 
+							strategy)
+					.instance();
+			
+			generator.writeConfigTemplate();
+			
+		} catch (ParseException | GenerationException e) {
+			e.printStackTrace();
+		}
+	}
 	
     public static void main( String[] args )
     {
@@ -265,7 +303,7 @@ public class App
 //    	integerExample();
 //    	doubleExample();
 //    	simpleObjectExample();
-   	simpleTwoFieldObjectExample();
+//    	simpleTwoFieldObjectExample();
 //    	simpleIgnoreFieldObjectExample();
 //    	nestedObjectExample();
 //    	simpleObjectListExample();
@@ -275,6 +313,9 @@ public class App
 //    	abstractClassEncapsulatedExamlple();
 //    	abstractRecursiveClassEncapsulatedExamlple();
 //    	simpleObjectWithList();
+//    	generateTemplate();
     	
     }
+
+	
 }

@@ -3,6 +3,7 @@ package gov.nasa.generator.generators;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
 import java.util.ArrayDeque;
@@ -13,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import gov.nasa.generator.annotations.Generate;
+import gov.nasa.generator.configurations.DefaultInput;
 import gov.nasa.generator.configurations.InputConf;
 import gov.nasa.generator.generators.NumberGenerator.TypeWrapper;
 
@@ -22,6 +23,7 @@ public abstract class AbstractGenerator<T> {
 	//required
 	protected Class<T> clazz;
 	protected GenerationStrategy<T> strategy;
+
 	
 	//optional with default values
 	protected InputConf input;
@@ -38,9 +40,10 @@ public abstract class AbstractGenerator<T> {
 		//required
 		private Class<T> clazz;
 		private GenerationStrategy<T> strategy;
+
 		
 		//optional with default values
-		private InputConf input = null;
+		private InputConf input=new DefaultInput();
 		private int depth=2; 
 		private int length=2;
 		private boolean topLvl=true;
@@ -50,8 +53,8 @@ public abstract class AbstractGenerator<T> {
 			clazz=c;
 			strategy=s;
 		}
-		
-		public Build<T> config(InputConf i){
+			
+		public Build<T> input(InputConf i){
 			input=i;
 			return this;
 		}
@@ -74,7 +77,7 @@ public abstract class AbstractGenerator<T> {
 		
 	}
 	
-	protected AbstractGenerator(Build<T> b){
+	protected AbstractGenerator(Build<T> b) throws GenerationException{
 		
 		clazz=b.clazz;
 		strategy=b.strategy;
@@ -82,6 +85,10 @@ public abstract class AbstractGenerator<T> {
 		depth=b.depth;
 		length=b.length;
 		topLvl=b.topLvl;
+		
+		if(clazz == null || strategy == null || input==null){
+			throw new GenerationException("Generator must have non-null target class, strategy and input");
+		}
 		
 	}
 	
@@ -100,7 +107,18 @@ public abstract class AbstractGenerator<T> {
 	
 	protected abstract AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException;
 		
-	
+	/**
+	 * Returns true if field should be considered in generation
+	 * 
+	 * @param field - field to check
+	 * @return true if if the field is associated with a generator
+	 */
+	protected boolean generable(Field field) {
+//		String key = generateFieldKey(field);
+//		boolean ret = input.exists(key); 
+		return  !isPrimitive(field) || input.exists(generateFieldKey(field));
+	}
+
 	/**
 	 * Analyzes the class T and all its superclasses and returns a list of 
 	 * fields that T has declared or inherited in order of declaration 
@@ -116,7 +134,7 @@ public abstract class AbstractGenerator<T> {
 		Class<?> current = clazz;
 		Deque<Field> fields = new ArrayDeque<Field>();
 		for (Field field : current.getDeclaredFields()) {
-			if(generable(field) || !isPrimitive(field)){
+			if(generable(field)){
 				fields.add(field);
 			}
 		}
@@ -124,7 +142,7 @@ public abstract class AbstractGenerator<T> {
 		List<Field> currentfields = new ArrayList<Field>();
 		while(current.getSuperclass()!=null){ // we don't want to process Object.class
 			for (Field field : current.getDeclaredFields()) {
-				if(!Modifier.isPrivate(field.getModifiers()) && (generable(field)|| !isPrimitive(field))){
+				if(!Modifier.isPrivate(field.getModifiers()) && generable(field)){
 					currentfields.add(field);
 				}
 			}
@@ -138,33 +156,27 @@ public abstract class AbstractGenerator<T> {
 	}
 	
 	
-	/**
-	 * Returns true if field should be considered in generation
-	 * 
-	 * @param field - field to check
-	 * @return true if if the field is associated with a generator
-	 */
-	private boolean generable(Field field) {
-		return  getGenerateAnnotation(field)!=null;
+	protected void noConstructor() throws GenerationException {
+		String msg = "Class "+ clazz.getSimpleName() +" must declare at least one constructor\n";
+		throw new GenerationException(msg);
 	}
 	
-	/**
-	 * Returns Generate annotation associated with the field
-	 * or null if field is not annotated
-	 * 
-	 * @param field - field for which generate annotation is queried
-	 * @return
-	 */
-	private Generate getGenerateAnnotation(Field field){
-		Generate generate = null;
-		for(Annotation annotation : field.getAnnotations()) {
-			if(annotation.annotationType() == Generate.class) {
-				generate=(Generate)annotation;
-			}
-
+	
+	protected void invalidConstructor(Class[] params) throws GenerationException {
+		String msg = "Class "+ clazz.getSimpleName() +" needs to declare an appropriate public constructor\n" +	
+		 "containing all the fields indended for generation as parameters" +
+		 "For instance:\n" +
+		 "public "+clazz.getSimpleName()+"(";
+		int p = 1;
+		for (Class c : params) {
+			msg+= c.getSimpleName()+ " p"+p + " ";
+			p++;
 		}
-		return generate;
+		msg+=")";
+		throw new GenerationException(msg);
+		
 	}
+	
 
 	/**
 	 * 
@@ -182,6 +194,9 @@ public abstract class AbstractGenerator<T> {
 	
 	/**
 	 * The method assigns a generator to a field depending on its type
+	 * A precondition is that this method is called only for generable fields
+	 * and class invariant is input != null
+	 * 
 	 * @param field - field of the clazz
 	 * @param <K> - primitive type parameter 
 	 * @return AbstractGenerator associated to the field
@@ -192,26 +207,17 @@ public abstract class AbstractGenerator<T> {
 	protected <K extends Number> AbstractGenerator<?> assignGenerators(Field field) 
 										  throws ParseException, GenerationException {
 		
-		//Is there the @Generate annotation?
-		Generate generate = null;
-		for(Annotation annotation : field.getAnnotations()) {
-			if(annotation.annotationType() == Generate.class) {
-				generate=(Generate)annotation;
-			}
-
-		}
-
-		//If there is one read from the configuration
-		if(generate!=null){
+		//read from the configuration
+		if(isPrimitive(field)){
 			//Primitive types (we assume that only primitive types are (possibly) annotated)
 			//TODO: this will change when we annotate also non-primitive types
 			String type = field.getType().getSimpleName().toUpperCase();
 			
 			String key = generateFieldKey(field);
 			
-			TypeWrapper<K> min = TypeWrapper.extractValue(input!=null ? input.readMin(key) : generate.min(), type);
-			TypeWrapper<K> max = TypeWrapper.extractValue(input!=null ? input.readMax(key) : generate.max(), type);
-			TypeWrapper<K> step = TypeWrapper.extractValue(input!=null ? input.readStep(key) : generate.step(), type);
+			TypeWrapper<K> min = TypeWrapper.extractValue(input.readMin(key), type);
+			TypeWrapper<K> max = TypeWrapper.extractValue(input.readMax(key), type);
+			TypeWrapper<K> step = TypeWrapper.extractValue(input.readStep(key), type);
 			
 			return NumberGenerator.builder(field.getType(),
 					   strategy, 
@@ -221,10 +227,7 @@ public abstract class AbstractGenerator<T> {
 							.instance();
 			
 		}
-		if(isPrimitive(field)){
-			//Skip unannotated primitive fields
-			return null;
-		}
+		
 		if(Collection.class.isAssignableFrom(field.getType())){
 			//lists
 			
@@ -233,6 +236,7 @@ public abstract class AbstractGenerator<T> {
 						
 			return ListGenerator.builder(genericClass,
 					strategy)
+					.input(input)
 					.depth(depth)
 					.length(length)
 					.topLvl(topLvl)
@@ -250,6 +254,7 @@ public abstract class AbstractGenerator<T> {
 			
 			return AbstractClassGenerator.builder(field.getType(),
 					strategy)
+					.input(input)
 					.depth(depth)
 					.length(length)
 					.topLvl(topLvl)
@@ -257,9 +262,10 @@ public abstract class AbstractGenerator<T> {
 			
 		}
 		
-		
+		//we assume a concrete class if none from above
 		return ClassGenerator.builder(field.getType(),
 				strategy)
+				.input(input)
 				.depth(depth)
 				.length(length)
 				.topLvl(topLvl)
@@ -288,7 +294,7 @@ public abstract class AbstractGenerator<T> {
 	 * on the standard output
 	 */
 	public void writeConfigTemplate(){
-		writeConfigTemplate(null);
+		writeConfigTemplate(input);
 	}
 
 

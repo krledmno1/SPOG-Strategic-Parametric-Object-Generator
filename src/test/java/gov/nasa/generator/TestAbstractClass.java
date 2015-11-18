@@ -7,6 +7,7 @@ import java.text.ParseException;
 
 import org.junit.Test;
 
+import gov.nasa.generator.configurations.CommonsInput;
 import gov.nasa.generator.examples.Abstract;
 import gov.nasa.generator.examples.CompositeObject;
 import gov.nasa.generator.examples.Encapsulator;
@@ -23,7 +24,12 @@ public class TestAbstractClass {
 	public void testRecursiveAbstractHirearchy() {
 		try {
 			GenerationStrategy<Abstract> strategy= new CartesianStrategy<Abstract>();
-			AbstractGenerator<Abstract> generator = AbstractClassGenerator.builder(Abstract.class, strategy).depth(3).instance();
+			AbstractGenerator<Abstract> generator = 
+					AbstractClassGenerator.builder(Abstract.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.depth(3)
+					.instance();
 			
 			
 			int count=0;
@@ -46,7 +52,11 @@ public class TestAbstractClass {
 	public void testEncapsulatedAbstractHirearchy() {
 		try {
 			GenerationStrategy<Encapsulator> strategy= new CartesianStrategy<Encapsulator>();
-			AbstractGenerator<Encapsulator> generator = ClassGenerator.builder(Encapsulator.class, strategy).instance();
+			AbstractGenerator<Encapsulator> generator = 
+					ClassGenerator.builder(Encapsulator.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.instance();
 			
 			int count=0;
 			while(generator.hasNext()){
@@ -71,7 +81,9 @@ public class TestAbstractClass {
 			CartesianStrategy<CompositeObject> strategy = new CartesianStrategy<CompositeObject>();
 
 			AbstractGenerator<CompositeObject> generator =  
-					ClassGenerator.builder(CompositeObject.class, strategy)
+					ClassGenerator.builder(CompositeObject.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.depth(1)
 					.instance();
 			
@@ -98,7 +110,9 @@ public class TestAbstractClass {
 			CartesianStrategy<CompositeObject> strategy = new CartesianStrategy<CompositeObject>();
 
 			AbstractGenerator<CompositeObject> generator =  
-					ClassGenerator.builder(CompositeObject.class, strategy)
+					ClassGenerator.builder(CompositeObject.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.depth(2)
 					.instance();
 			

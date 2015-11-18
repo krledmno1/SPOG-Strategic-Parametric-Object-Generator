@@ -67,10 +67,21 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 			type = type.toUpperCase();
 			switch(type){
 				case "DOUBLE":{
-					return (TypeWrapper<K>) DoubleWrapper.extractValue(value);
+					try{
+						return (TypeWrapper<K>) DoubleWrapper.extractValue(value);
+					}
+					catch(NumberFormatException e){
+						throw new ParseException("Parameter value \"" + value + "\" is not a " + type ,0);
+					}
 				}
 				case "INTEGER":{
+					try{
 					return (TypeWrapper<K>) IntWrapper.extractValue(value);
+					}
+					catch(NumberFormatException e){
+						throw new ParseException("Parameter value \"" + value + "\" is not a " + type ,0);
+					}
+					
 				}
 				default:{
 					throw new ParseException("Type " + type + " not supported", 0);
@@ -258,6 +269,7 @@ public class NumberGenerator <T extends Number> extends AbstractGenerator<T> {
 	@Override
 	protected AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException {
 		return builder(clazz, strategy,min,max,step)
+				.input(input)
 				.depth(depth)
 				.length(length)
 				.topLvl(topLvl)

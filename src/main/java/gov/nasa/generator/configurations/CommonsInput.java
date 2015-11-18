@@ -83,6 +83,11 @@ public class CommonsInput implements InputConf {
 		config.setProperty(key+".step", value);
 	}
 
+	@Override
+	public boolean exists(String key) {
+		return config.containsKey(key+".min");
+	}
+
 	
 
 }

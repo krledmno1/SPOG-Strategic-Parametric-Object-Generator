@@ -39,6 +39,7 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 		//list might need to be extended to consider min, max and step to support numbers
 		generator =  ClassGenerator.builder(clazz,
 											strategy)
+											.input(input)
 											.depth(depth)
 											.length(length)
 											.topLvl(topLvl)
@@ -70,6 +71,7 @@ public class ListGenerator<T> extends AbstractGenerator<T> {
 	@Override
 	protected AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException {
 		return builder(clazz, strategy)
+				.input(input)
 				.depth(depth)
 				.length(length)
 				.topLvl(topLvl)

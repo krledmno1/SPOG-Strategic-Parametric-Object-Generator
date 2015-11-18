@@ -3,11 +3,13 @@ package gov.nasa.generator.generators;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import gov.nasa.generator.configurations.InputConf;
 
@@ -67,37 +69,49 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 	protected ClassGenerator(gov.nasa.generator.generators.AbstractGenerator.Build<T> b) throws ParseException, GenerationException {
 		super(b);
 		
+		//get the FIRST constructor
+		Constructor<T>[] constructors = (Constructor<T>[]) clazz.getConstructors();
+		if(constructors.length==0){
+			noConstructor();
+		}
+		
+		//all declared fields
 		fieldList = getAllFields();
+		
+		//generable fields
 
 		//get the constructor and assign generators
-		Class [] params = new Class[fieldList.length];
-		int i=0;
+		List<Class> paramList = new ArrayList<Class>();
+		
 		for (Field field : fieldList) {
 			//assign generators
 			AbstractGenerator<?> gen = assignGenerators(field);
 			if(gen!=null){
 				generators.put(field, gen);
 			}
+			else{
+				throw new GenerationException("Unsupported "
+						+ "java construct: we currently support "
+						+ "abstract, concrete classes, lists, "
+						+ "Integers and Doubles");
+			}
 			
 			//get parameter list for the constructor
-			params[i]=field.getType();
+			paramList.add(field.getType());
+				
+			
+		}
+		Class [] params = new Class[paramList.size()];
+		int i = 0;
+		for (Class cs : paramList) {
+			params[i]=cs;
 			i++;
 		}
 		try {
+			//redundant
 			constructor = (Constructor<T>) clazz.getConstructor(params);
 		} catch (NoSuchMethodException | SecurityException e) {
-			String msg = "Class "+ clazz.getSimpleName() +" needs to declare "
-					+ "a PUBLIC constructor with all the fields as parameters"
-					+ "For instance:\n"
-					+ "public "+clazz.getSimpleName()+"(";
-					int p = 1;
-					for (Class c : params) {
-						msg+= c.getSimpleName()+ " p"+p + " ";
-						p++;
-					}
-					msg+=")";
-			
-			throw new ParseException(msg, 0);
+			invalidConstructor(params);
 		}
 
 		//reset
@@ -106,6 +120,10 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 	}
 
 	
+
+	
+
+
 	//implementation of abstract methods
 	public T generate() throws ParseException, GenerationException{
 		return strategy.generate(this);
@@ -129,6 +147,7 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 	@Override
 	protected AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException {
 		return builder(clazz, strategy)
+				.input(input)
 				.depth(depth)
 				.length(length)
 				.topLvl(topLvl)
@@ -152,16 +171,9 @@ public class ClassGenerator<T> extends AbstractGenerator<T> {
 		
 		for (Field field : fieldList) {
 			if(isPrimitive(field)){
-				if(config!=null){
 					config.writeMin(generateFieldKey(field), "");
 					config.writeMax(generateFieldKey(field), "");
 					config.writeStep(generateFieldKey(field), "");
-				}
-				else{
-					System.out.println(generateFieldKey(field)+".min"+"=");
-					System.out.println(generateFieldKey(field)+".max"+"=");
-					System.out.println(generateFieldKey(field)+".step"+"=");
-				}
 			}
 			else{
 				generators.get(field).checkAndVisit(config);

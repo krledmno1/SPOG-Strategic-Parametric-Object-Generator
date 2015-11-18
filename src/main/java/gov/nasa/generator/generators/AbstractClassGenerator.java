@@ -63,6 +63,7 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 						
 						for(int i=depth-1;i>0;i--){
 							generators.add(ClassGenerator.builder(sub, strategy)
+									 .input(input)
 									 .depth(i)
 									 .length(length)
 									 .topLvl(false)
@@ -72,6 +73,7 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 				else{
 					if(topLvl || depth==1){
 						generators.add(ClassGenerator.builder(sub, strategy)
+							 .input(input)
 							 .depth(depth)
 							 .length(length)
 							 .topLvl(topLvl)
@@ -84,6 +86,7 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 		else{
 			for (Class<? extends T> sub : allClasses) {
 				generators.add(ClassGenerator.builder(sub, strategy)
+						 .input(input)
 						 .depth(depth)
 						 .length(length)
 						 .topLvl(topLvl)
@@ -139,6 +142,7 @@ public class AbstractClassGenerator<T> extends AbstractGenerator<T> {
 	@Override
 	protected AbstractGenerator<T> cloneGenerator() throws ParseException, GenerationException {
 		return builder(clazz, strategy)
+				.input(input)
 				.depth(depth)
 				.length(length)
 				.topLvl(topLvl)

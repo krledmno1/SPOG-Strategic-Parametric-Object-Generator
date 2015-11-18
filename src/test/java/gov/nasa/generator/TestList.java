@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import gov.nasa.generator.configurations.CommonsInput;
 import gov.nasa.generator.examples.B;
 import gov.nasa.generator.examples.C;
 import gov.nasa.generator.examples.ListEx;
@@ -24,7 +25,11 @@ public class TestList {
 	public void testSimpleObjectList() {
 		try {
 			GenerationStrategy<B> strategy= new CartesianStrategy<B>();
-			AbstractGenerator<B> generator = ListGenerator.builder(B.class, strategy).length(3).instance();
+			AbstractGenerator<B> generator = ListGenerator.builder(B.class, 
+					strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.length(3)
+					.instance();
 			
 			int count=0;
 			while(generator.hasNext()){
@@ -50,7 +55,12 @@ public class TestList {
 	public void testNestedObjectList() {
 		try {
 			GenerationStrategy<C> strategy= new CartesianStrategy<C>();
-			AbstractGenerator<C> generator = ListGenerator.builder(C.class, strategy).length(3).instance();
+			AbstractGenerator<C> generator = 
+					ListGenerator.builder(C.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
+					.length(3)
+					.instance();
 			
 			int count=0;
 			while(generator.hasNext()){
@@ -77,7 +87,9 @@ public class TestList {
 			CartesianStrategy<ListEx> strategy = new CartesianStrategy<ListEx>();
 
 			AbstractGenerator<ListEx> generator =  
-					ClassGenerator.builder(ListEx.class, strategy)
+					ClassGenerator.builder(ListEx.class, 
+							strategy)
+					.input(new CommonsInput("resources/params.properties"))
 					.instance();
 			
 			int count = 0;
