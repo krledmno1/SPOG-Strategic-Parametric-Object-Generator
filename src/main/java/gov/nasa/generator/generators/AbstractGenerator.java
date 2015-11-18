@@ -276,7 +276,7 @@ public abstract class AbstractGenerator<T> {
 	 * @return unique string key
 	 */
 	protected String generateFieldKey(Field field) {
-		return clazz.getName()+field.getName();
+		return clazz.getName()+"."+field.getName();
 	}
 
 	

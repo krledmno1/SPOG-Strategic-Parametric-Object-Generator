@@ -95,6 +95,9 @@ public class App
 				
 				while(generator.hasNext())
 					System.out.println(generator.generate());
+				
+				
+				generator.writeConfigTemplate(new CommonsInput("bla.properties"));
 			
 		} catch (ParseException | GenerationException e) {
 			e.printStackTrace();
@@ -262,7 +265,7 @@ public class App
 //    	integerExample();
 //    	doubleExample();
 //    	simpleObjectExample();
-//    	simpleTwoFieldObjectExample();
+   	simpleTwoFieldObjectExample();
 //    	simpleIgnoreFieldObjectExample();
 //    	nestedObjectExample();
 //    	simpleObjectListExample();
